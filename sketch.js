@@ -17,15 +17,20 @@ function setup() {
   facemesh = ml5.facemesh(video, modelReady);
   facemesh.on('predict', results => {
     predictions = results;
+
+    // 初始化圓環位置為鼻子
+    if (predictions.length > 0) {
+      const keypoints = predictions[0].scaledMesh;
+      const nose = keypoints[1]; // 鼻子點
+      circleX = nose[0];
+      circleY = nose[1];
+    }
   });
 
   handpose = ml5.handpose(video, modelReady);
   handpose.on('predict', results => {
     handPredictions = results;
   });
-
-  circleX = width / 2;
-  circleY = height / 2;
 }
 
 function modelReady() {
@@ -37,11 +42,6 @@ function draw() {
 
   if (predictions.length > 0) {
     const keypoints = predictions[0].scaledMesh;
-
-    // 預設圓環位置為第94點
-    const [x, y] = keypoints[94];
-    circleX = x;
-    circleY = y;
 
     if (handPredictions.length > 0) {
       const hand = handPredictions[0];
